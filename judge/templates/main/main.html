@@ -18,21 +18,137 @@
                 height:700px;
             }
         </style>
+        <script>
+                var csrf_token = '{{csrf_token}}';
+                var code_mode ="c++";
+                //코드 모드 기본값이 필요하다.
+        </script>
     </head>
     <body>
-            <div id="editor">function foo(items) {
+
+            {% if user.is_authenticated %}
+                <h1>로그인 함</h1>
+                {{ user.username }}
+                {{ user.email }}
+            {% else %}
+                <h1>로그인 안함</h1>
+            {% endif %}
+
+
+            <h1></h1>
+            <select id="code_select" onchange="codeSelect()">
+                <option value="C">C(gcc-4.8.5)</option>
+                <option value="C++">C++(gcc-4.8.5)</option>
+                <option value="J">Java(java-1.8.0)</option>
+            </select>
+
+
+            <script>
+                    function codeSelect(){
+
+                        var codeSelect = document.getElementById("code_select");
+
+                        var codeValue = codeSelect.options[codeSelect.selectedIndex].value;
+
+                        if(codeValue == "C") {
+                            editor.session.setMode("ace/mode/c_cpp");
+                            code_mode = "c";
+                        }else if(codeValue == "C++") {
+                            editor.session.setMode("ace/mode/c_cpp");
+                            code_mode = "c++";
+                        }else{
+                            editor.session.setMode("ace/mode/java");
+                            code_mode = "java";
+                        }
+
+                        console.log(codeValue);
+                    }
+            </script>
+
+            <style>
+                #code_select {
+                    vertical-align: middle;
+                    display: inline-block;
+                    width: 100%;
+                    height: 30px;
+                    overflow: hidden;
+                    overflow: -moz-hidden-unscrollable;
+                    border: 1px solid #e2e2e2;
+                    width:126px;
+                }
+            </style>
+
+            <div id="editor">
+                function foo(items) {
                     var x = "All this is syntax highlighted";
                     return x;
-                }</div>
+                }
+            </div>
 
 
-        <h1>
-            메인 페이지
-        </h1>
+        <button id="submit_button">제출</button>
+        <style>
+            #submit_button{
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+            }
+            #submit_button:hover{
+                opacity: 0.8;
+            }
+
+        </style>
+
         <script>
                 var editor = ace.edit("editor");
+                editor.setOptions({
+                      fontSize: "15pt"
+                });
                 editor.setTheme("ace/theme/monokai");
-                editor.session.setMode("ace/mode/javascript");
+            
+//                var JavaScriptMode = ace.require("ace/mode/javascript").Mode;
+//                editor.session.setMode(new JavaScriptMode());
+            
+                editor.session.setMode("ace/mode/c_cpp");
+//                editor.session.setMode("ace/mode/java");
+
+//                editor.session.setMode("ace/mode/javascript");
+
+
+
+//                editor.session.setMode("ace/mode/css");
         </script>
+
+        <script>
+            $('#submit_button').click(function(){
+
+//                var code = $('#editor').text();
+                var user_code = editor.getValue();
+                var code_type = code_mode;
+
+                $.ajax({
+                    url: 'http://localhost:8000/test/',
+                    type: 'POST',
+                    data: {
+                        code: user_code,
+                        codeMode: code_type,
+                        csrfmiddlewaretoken:csrf_token,
+                    },
+//                    async:false,
+                    }).done(function(data){
+                        
+                        console.log("제출");
+                        console.log(data)
+
+                    })
+                })
+        </script>
+
+
     </body>
 </html>

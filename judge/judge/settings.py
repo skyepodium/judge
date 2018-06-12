@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'main',
+    'score',
 ]
 
 AUTH_USER_MODEL = 'user.User'

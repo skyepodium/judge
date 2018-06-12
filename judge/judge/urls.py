@@ -17,9 +17,22 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from main.views import main_page #추가
+
+from main.views import main_page
+
+#인증
+from user.views import signup
+from user.views import signin
+
+#채점
+from score.views import code_test
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main_page),
+    path('', main_page, name = 'main'),
+    path('signup/', signup, name = 'signup'),
+    path('signin/', signin, name = 'signin'),
+
+    path('test/', code_test, name = 'code_test'),
+    
 ]
